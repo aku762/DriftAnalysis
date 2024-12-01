@@ -19,6 +19,7 @@ import random
 
 from secml.ml.classifiers import CClassifierSVM
 from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score
+from sklearn.model_selection import cross_val_score #Added for multi-core support
 from sklearn.manifold import TSNE
 
 import explanations
@@ -50,9 +51,15 @@ class Analysis():
                         "train_amount":[], "test_amount":[], "total_family":[], "explanations":[], "correct_family":[], 
                         "family_class":[], "feature_names":feature_names}
         
-    
+    # AK: Changes made here to take advantage of multiple cores.
     def train_svc_model(self,X_train, y_train):
         model = svm.SVC(C = 1.0, kernel='linear')
+
+        # Use cross-validation to train the model in parallel
+        scores = cross_val_score(model, X_train, y_train, cv=5, n_jobs=-1)  # This will utilize all available cores
+        print("Cross-validation accuracy scores:", scores)
+
+        # Fitting the final model to all of the training data after cross-validation
         model.fit(X_train, y_train)
         return model
 
@@ -225,17 +232,18 @@ class Analysis():
             final_output.append(output[month])
         
         return final_output
-
-    # added specific_family parameter default to 'DNOTUA' per original spec
     
     def training(self, family=None, additional_months=False, specific_family=None):
         """Function that trains a model using initial training set
-        TODO: Add arguments for adding extra samples depending on family and month
+        TODO: Add arguments for adding extra samples depending on month
+
+        AK: added specific_family argument for adding extra samples using additional_months.
         
         Args:
             family (list, optional): List of families selected for training, if None then
             all familes are used.
             additional_months (bool, optional): Whether to add additional training months
+            specific_family (string, optional): Which family to use for additional training months
 
         Returns:
             object: Trained model
@@ -253,6 +261,8 @@ class Analysis():
         
         # Add extra training samples from test set
         if additional_months:
+            if specific_family==None: specific_family = 'DNOTUA' # Default to DNOTUA if not set
+
             selected_indexes += self.family_selection_from_index(self.initial_test[31],[specific_family])
             selected_indexes += self.family_selection_from_index(self.initial_test[32],[specific_family])
             selected_indexes += self.family_selection_from_index(self.initial_test[33],[specific_family])
@@ -596,7 +606,7 @@ class Analysis():
             exit()
             
         if experiment.lower() == 'base_additional':
-            trained_model, trained_amount = self.training(training_family, additional_months=True, specific_family=specific_family)
+            trained_model, trained_amount = self.training(training_family, additional_months=True, specific_family=specific_family) # Added specific_family parameter
             self.testing(trained_model, trained_amount, testing_family)         
         else:
             trained_model, trained_amount = self.training(training_family)
