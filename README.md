@@ -1,6 +1,7 @@
 # Updates made to this branch for AI & Cyber Project
 
-* `paper_results.ipynb` - Fully Executed Jupytr Notebook ran on Local Workstation.
+* `paper_results.ipynb` - Fully Executed Jupytr Notebook ran on Local Workstation replicating the paper's results.
+* `results_airpush.ipynb` - Fully Executed Jupytr Notebook ran on Local Workstation, modified second model to include Airpush instead of Dnotua.
 * `analysis.py`         - Updates made for multi-core (not validated) functionality in `train_svc_model()`, updated `training()` to add `specific_family` parameter which defaults to 'DNOTUA' should `additional_months` be *True* and the `specfic_family` is not specified, also updated `run()` to add the `family` parameter and adjusted logic to pass the specific family name if provided.
 
 # Drift Forensics of Malware Classifiers
