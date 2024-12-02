@@ -584,7 +584,7 @@ class Analysis():
                 pickle.dump(tsne_final_result,f)
         
         
-    def run(self, training_family, testing_family, experiment, dataset, specific_family=None):
+    def run(self, training_family, testing_family, experiment, dataset, family=None):
         """Function that runs the corresponding experiment depending on the
         paramaters provided. Currently there are 3 experiments implemented. For
         detailed explanation refer to corresponding function.
@@ -606,7 +606,7 @@ class Analysis():
             exit()
             
         if experiment.lower() == 'base_additional':
-            trained_model, trained_amount = self.training(training_family, additional_months=True, specific_family=specific_family) # Added specific_family parameter
+            trained_model, trained_amount = self.training(training_family, additional_months=True, specific_family=family) # Added specific_family parameter
             self.testing(trained_model, trained_amount, testing_family)         
         else:
             trained_model, trained_amount = self.training(training_family)
